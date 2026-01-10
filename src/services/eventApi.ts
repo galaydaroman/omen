@@ -1,0 +1,41 @@
+import { createApi } from '@reduxjs/toolkit/query/react'
+import type { Event, Events, EventLog, EventLogs } from '../types'
+import EventsStorageAdapter from './eventsStorageAdapter'
+
+const eventsStorage = new EventsStorageAdapter('localStorage')
+window.eventsStorage = eventsStorage
+
+export const eventApi = createApi({
+  reducerPath: 'eventApi',
+  tagTypes: ['Event', 'EventLog'],
+  endpoints: builder => ({
+    fetchEvents: builder.query<Events, void>({
+      queryFn: () => eventsStorage.fetchEvents(),
+      providesTags: () => [{ type: 'Event', id: 'LIST' }]
+    }),
+    addEvent: builder.mutation<void, Partial<Event>>({
+      queryFn: (event) => eventsStorage.addEvent(event),
+      invalidatesTags: [{ type: 'Event', id: 'LIST' }]
+    }),
+    fetchEventLogs: builder.query<EventLogs, void>({
+      queryFn: () => eventsStorage.fetchEventLogs(),
+      providesTags: () => [{ type: 'EventLog', id: 'LIST' }]
+    }),
+    addEventLog: builder.mutation<void, Partial<EventLog>>({
+      queryFn: (eventLog) => eventsStorage.addEventLog(eventLog),
+      invalidatesTags: [{ type: 'EventLog', id: 'LIST' }]
+    }),
+    updateEventLog: builder.mutation<void, EventLog>({
+      queryFn: (eventLog) => eventsStorage.updateEventLog(eventLog),
+      invalidatesTags: [{ type: 'EventLog', id: 'LIST' }]
+    })
+  })
+})
+
+export const {
+  useFetchEventsQuery,
+  useAddEventMutation,
+  useFetchEventLogsQuery,
+  useAddEventLogMutation,
+  useUpdateEventLogMutation
+} = eventApi

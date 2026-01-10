@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router'
 
 export default function NewLog() {
@@ -6,6 +7,6 @@ export default function NewLog() {
 
   return <>
     <p>New log steps for {name}</p>
-    <a href="/">Back</a>
+    <Link to="/">Back</Link>
   </>
 }

@@ -1,17 +1,20 @@
-import { useState } from 'react'
+import { useFetchEventsQuery } from './services/eventApi'
+import { Link } from 'react-router-dom'
 import './Home.css'
 
 export default function Home() {
-  const [events] = useState(['Cooking', 'Sleeping', 'Pooping'])
+  const { data: events, isLoading } = useFetchEventsQuery()
 
   return <div className="events-container">
     <div className="event">
-      <a href="/new_event" className="event-button">+</a>
+      <Link to="/new_event" className="event-button">+</Link>
     </div>
     {
-      events.map(event => (
-        <div className="event">
-          <a href={`/new?name=${event}`} className="event-button">{event}</a>
+      isLoading
+        ? '...'
+        : events?.map(event => (
+        <div className="event" key={event.id}>
+          <Link to={`/new?name=${event.name}`} className="event-button">{event.name}</Link>
         </div>
       ))
     }
