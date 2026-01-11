@@ -28,7 +28,7 @@ export default class EventsLocalStorage implements StorageDataApi {
 
   isStorageDataCorrect(object: unknown): object is StorageData {
     return (
-      object &&
+      !!object &&
       typeof object === 'object' &&
       'events' in object &&
       'eventLogs' in object &&
@@ -49,7 +49,7 @@ export default class EventsLocalStorage implements StorageDataApi {
     }
 
     try {
-      const parsed: unknown = JSON.parse(this.getRawData())
+      const parsed: unknown = JSON.parse(raw)
 
       if (this.isStorageDataCorrect(parsed)) {
         return parsed
@@ -79,7 +79,7 @@ export default class EventsLocalStorage implements StorageDataApi {
     return this.eventsMapCache ??= this.getCachedData().events.reduce((cache, event) => {
       cache[event.id] = event
       return cache
-    })
+    }, {} as Record<string, Event>)
   }
 
   saveData(data: StorageData): void {
@@ -94,7 +94,7 @@ export default class EventsLocalStorage implements StorageDataApi {
 
   fetchEventById(eventId: string): Event | null {
     const eventMap = this.getEventsMap()
-    return eventMap[eventId]
+    return eventMap[eventId] || null
   }
 
   validateAndPrepareEvent(event: Partial<Event>): Event {
@@ -132,7 +132,7 @@ export default class EventsLocalStorage implements StorageDataApi {
       throw new Error("[EventsLocalStorage] EventLog's reference to eventId is missing")
     }
 
-    const event = this.fetchEventById(event.eventId)
+    const event = this.fetchEventById(eventLog.eventId)
     if (!event) {
       throw new Error('[EventsLocalStorage] EventLog references to not existing event')
     }
@@ -142,33 +142,32 @@ export default class EventsLocalStorage implements StorageDataApi {
       id: nanoid(6),
       eventId: eventLog.eventId,
       tags: eventLog.tags || [],
-      note: eventLog.note,
+      note: eventLog.note || '',
       createdAt: timestamp,
       updatedAt: timestamp
     }
   }
 
   async addEventLog(eventLog: Partial<EventLog>): Promise<void> {
-    // add new eventLog
     const newEventLog = this.validateAndPrepareEventLog(eventLog)
     const data = this.getCachedData()
     const newEventLogs = data.eventLogs.concat(newEventLog)
 
-    // update event with new tags and recent use tags
     let updatedEvents = data.events
     if (newEventLog.tags.length) {
-      const event = this.fetchEventById(eventId)
-      const updatedTags = [...new Set([...newEventLog.tags, ...event.tags])]
-      const updatedEvent = {
-        ...event,
-        tags: updatedTags
+      const event = this.fetchEventById(newEventLog.eventId)
+      if (event) {
+        const updatedTags = [...new Set([...newEventLog.tags, ...event.tags])]
+        const updatedEvent = {
+          ...event,
+          tags: updatedTags
+        }
+
+        updatedEvents = data.events.map(e => {
+          return e.id === newEventLog.eventId ? updatedEvent : e
+        })
       }
-
-      updatedEvents = data.events.map(event => {
-        return event.id === eventId ? updatedEvent : event
-      })
     }
-
 
     const newData = {
       ...data,
@@ -180,7 +179,14 @@ export default class EventsLocalStorage implements StorageDataApi {
   }
 
   async updateEventLog(eventLog: EventLog): Promise<void> {
-    console.log(eventLog)
-    // TBD
+    const data = this.getCachedData()
+    const updatedLogs = data.eventLogs.map(log =>
+      log.id === eventLog.id ? { ...eventLog, updatedAt: new Date().toISOString() } : log
+    )
+
+    this.saveData({
+      ...data,
+      eventLogs: updatedLogs
+    })
   }
 }
