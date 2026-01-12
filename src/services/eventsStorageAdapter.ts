@@ -6,7 +6,7 @@ type StorageDataConstructor = new () => StorageDataApi
 interface StorageApiError {
   status: string,
   error: string,
-  data: unknown
+  data: { message: string }
 }
 
 interface StorageApiResponse<ReturnType> {
@@ -43,7 +43,7 @@ export default class EventsStorageAdapter implements StorageDataApi {
         error: {
           status: 'CUSTOM_ERROR',
           error: errorMessage,
-          data: error
+          data: error?.message
         }
       }
     }

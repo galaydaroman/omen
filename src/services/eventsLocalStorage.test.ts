@@ -47,7 +47,7 @@ describe('EventsLocalStorage', () => {
     })
 
     it('should throw error when adding event without name', async () => {
-      await expect(service.addEvent({})).rejects.toThrow('[EventsLocalStorage] Event name is missing')
+      await expect(service.addEvent({})).rejects.toThrow('Event name is missing')
     })
   })
 
@@ -100,11 +100,11 @@ describe('EventsLocalStorage', () => {
     })
 
     it('should throw if eventId is missing', async () => {
-      await expect(service.addEventLog({})).rejects.toThrow("[EventsLocalStorage] EventLog's reference to eventId is missing")
+      await expect(service.addEventLog({})).rejects.toThrow("EventLog's reference to eventId is missing")
     })
 
     it('should throw if eventId does not exist', async () => {
-      await expect(service.addEventLog({ eventId: 'non-existent' })).rejects.toThrow('[EventsLocalStorage] EventLog references to not existing event')
+      await expect(service.addEventLog({ eventId: 'non-existent' })).rejects.toThrow('EventLog references to not existing event')
     })
   })
 

@@ -99,7 +99,13 @@ export default class EventsLocalStorage implements StorageDataApi {
 
   validateAndPrepareEvent(event: Partial<Event>): Event {
     if (!event.name || typeof event.name !== 'string') {
-      throw new Error('[EventsLocalStorage] Event name is missing')
+      throw new Error('Event name is missing')
+    }
+
+    const { events } = this.getCachedData()
+    const eventNames = events.map(event => event.name.toLocaleLowerCase())
+    if (eventNames.includes(event.name.toLocaleLowerCase())) {
+      throw new Error('Event name is already in use')
     }
 
     return {
@@ -129,12 +135,12 @@ export default class EventsLocalStorage implements StorageDataApi {
 
   validateAndPrepareEventLog(eventLog: Partial<EventLog>): EventLog {
     if (!eventLog.eventId) {
-      throw new Error("[EventsLocalStorage] EventLog's reference to eventId is missing")
+      throw new Error("EventLog's reference to eventId is missing")
     }
 
     const event = this.fetchEventById(eventLog.eventId)
     if (!event) {
-      throw new Error('[EventsLocalStorage] EventLog references to not existing event')
+      throw new Error('EventLog references to not existing event')
     }
 
     const timestamp = new Date().toISOString()
