@@ -4,9 +4,11 @@ import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../type
 type StorageDataConstructor = new () => StorageDataApi
 
 interface StorageApiError {
-  status: string,
-  error: string,
-  data: { message: string }
+  error: {
+    status: string,
+    error: string,
+    data?: string
+  }
 }
 
 interface StorageApiResponse<ReturnType> {
@@ -15,11 +17,15 @@ interface StorageApiResponse<ReturnType> {
 
 type ResponseValue<ReturnType> = Promise<StorageApiResponse<ReturnType> | StorageApiError>
 
+interface StandardError {
+  message?: string
+}
+
 const storageTypes: Record<string, StorageDataConstructor> = {
   localStorage: EventsLocalStorage
 }
 
-export default class EventsStorageAdapter implements StorageDataApi {
+export default class EventsStorageAdapter {
   private readonly StorageClass: StorageDataConstructor
   private readonly storage: StorageDataApi
 
@@ -43,41 +49,41 @@ export default class EventsStorageAdapter implements StorageDataApi {
         error: {
           status: 'CUSTOM_ERROR',
           error: errorMessage,
-          data: error?.message
+          data: (error as StandardError)?.message
         }
       }
     }
   }
 
-  fetchEvents(): Promise<Events> {
+  fetchEvents(): ResponseValue<Events> {
     return this.formatResponse<Events>(
       'Faied to fetch events',
       () => this.storage.fetchEvents()
     )
   }
 
-  addEvent(event: Partial<Event>): Promise<void> {
+  addEvent(event: Partial<Event>): ResponseValue<void> {
     return this.formatResponse<void>(
       'Failed to add event',
       () => this.storage.addEvent(event)
     )
   }
 
-  fetchEventLogs(limit: number = 30): Promise<EventLogs> {
+  fetchEventLogs(limit: number = 30): ResponseValue<EventLogs> {
     return this.formatResponse<EventLogs>(
       'Failed to fetch event logs',
       () => this.storage.fetchEventLogs(limit)
     )
   }
 
-  addEventLog(eventLog: Partial<EventLog>): Promise<void> {
+  addEventLog(eventLog: Partial<EventLog>): ResponseValue<void> {
     return this.formatResponse<void>(
       'Failed to add event log',
       () => this.storage.addEventLog(eventLog)
     )
   }
 
-  updateEventLog(eventLog: EventLog): Promise<void> {
+  updateEventLog(eventLog: EventLog): ResponseValue<void> {
     return this.formatResponse<void>(
       'Failed to update event log',
       () => this.storage.updateEventLog(eventLog)

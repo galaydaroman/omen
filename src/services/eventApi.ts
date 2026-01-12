@@ -1,12 +1,13 @@
-import { createApi } from '@reduxjs/toolkit/query/react'
+import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Event, Events, EventLog, EventLogs } from '../types'
 import EventsStorageAdapter from './eventsStorageAdapter'
 
 const eventsStorage = new EventsStorageAdapter('localStorage')
-window.eventsStorage = eventsStorage
+// window.eventsStorage = eventsStorage
 
 export const eventApi = createApi({
   reducerPath: 'eventApi',
+  baseQuery: fakeBaseQuery(),
   tagTypes: ['Event', 'EventLog'],
   endpoints: builder => ({
     fetchEvents: builder.query<Events, void>({

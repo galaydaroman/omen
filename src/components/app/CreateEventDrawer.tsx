@@ -23,23 +23,25 @@ import type { Event } from '@/types'
 
 export default function CreateEventDrawer() {
   const [open, _setOpen] = useState(false)
-  const [event, setEvent] = useState({ name: '' } as Partial<Event>)
-  const [addEvent, { isLoading, error, reset }] = useAddEventMutation()
+  const [event, setEvent] = useState<Partial<Event>>({ name: '' })
+  const [addEvent, { isLoading, error: apiError, reset }] = useAddEventMutation()
 
-  const changeEventName = useCallback(e => {
-    setEvent({
-      ...event,
+  const errorMessage = (apiError as { data?: string })?.data
+
+  const changeEventName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEvent(prev => ({
+      ...prev,
       name: e.target.value
-    })
-  }, [event, setEvent])
+    }))
+  }, [])
 
-  const setOpen = useCallback(value => {
+  const setOpen = useCallback((value: boolean) => {
     if (value) {
       reset()
-      setEvent({ name: '' } as Partial<Event>)
+      setEvent({ name: '' })
     }
     _setOpen(value)
-  }, [_setOpen, setEvent, reset])
+  }, [reset])
 
   const handleAddEvent = useCallback(() => {
     addEvent(event)
@@ -84,7 +86,7 @@ export default function CreateEventDrawer() {
                   value={event.name}
                   onChange={changeEventName}
                 />
-                <FieldError errors={error ? [{ message: error?.data }] : null} />
+                <FieldError errors={errorMessage ? [{ message: errorMessage }] : undefined} />
               </Field>
             </FieldGroup>
             <DrawerFooter>
