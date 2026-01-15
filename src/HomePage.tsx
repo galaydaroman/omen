@@ -18,9 +18,9 @@ import {
 } from '@/components/ui/empty'
 import { ChevronRightIcon, BirdIcon } from 'lucide-react'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
-import './Home.css'
+import './HomePage.css'
 
-export default function Home() {
+export default function HomePage() {
   const { data: events, isLoading } = useFetchEventsQuery()
 
   if (isLoading) {

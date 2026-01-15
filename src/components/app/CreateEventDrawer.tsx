@@ -73,7 +73,7 @@ export default function CreateEventDrawer() {
             <DrawerDescription></DrawerDescription>
           </DrawerHeader>
           <form onSubmit={onSubmit}>
-            <FieldGroup className="pb-20">
+            <FieldGroup className="pb-10">
               <Field>
                 <FieldLabel htmlFor="event-name">
                   Event name*
@@ -82,7 +82,6 @@ export default function CreateEventDrawer() {
                   id="event-name"
                   placeholder="Biking..."
                   required
-                  autoFocus
                   value={event.name}
                   onChange={changeEventName}
                 />
@@ -92,6 +91,7 @@ export default function CreateEventDrawer() {
             <DrawerFooter>
               <Button
                 type="submit"
+                autoFocus
                 disabled={isLoading}
               >
                 {

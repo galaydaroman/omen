@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../types'
 
-const LOCAL_STORAGE_KEY = 'omen-events'
+export const LOCAL_STORAGE_KEY = 'omen-events'
 
 interface StorageData {
   events: Events,

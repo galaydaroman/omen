@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router'
 
-export default function NewLog() {
+export default function NewLogPage() {
   const [searchParams] = useSearchParams()
   const name = searchParams.get('name')
 

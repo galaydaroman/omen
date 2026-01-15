@@ -1,9 +1,10 @@
 import { createBrowserRouter } from 'react-router'
 
 import HomeLayout from './HomeLayout'
-import Home from './Home'
-import NewLog from './NewLog'
-import NewEvent from './NewEvent'
+import HomePage from './HomePage'
+import NewLogPage from './NewLogPage'
+import EditEventPage from './EditEventPage'
+import DebugPage from './DebugPage'
 
 const router = createBrowserRouter([
   {
@@ -11,15 +12,19 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: Home
+        Component: HomePage
       },
       {
         path: 'new',
-        Component: NewLog
+        Component: NewLogPage
       },
       {
-        path: 'new_event',
-        Component: NewEvent
+        path: 'edit_event',
+        Component: EditEventPage
+      },
+      {
+        path: 'debug',
+        Component: DebugPage
       }
     ]
   },
