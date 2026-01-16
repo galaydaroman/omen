@@ -24,7 +24,10 @@ export const eventApi = createApi({
     }),
     addEventLog: builder.mutation<void, Partial<EventLog>>({
       queryFn: (eventLog) => eventsStorage.addEventLog(eventLog),
-      invalidatesTags: [{ type: 'EventLog', id: 'LIST' }]
+      invalidatesTags: [
+        { type: 'EventLog', id: 'LIST' },
+        { type: 'Event', id: 'LIST' }
+      ]
     }),
     updateEventLog: builder.mutation<void, EventLog>({
       queryFn: (eventLog) => eventsStorage.updateEventLog(eventLog),

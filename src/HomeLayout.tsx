@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Outlet, useLocation } from 'react-router'
+import { Outlet, useLocation, Link } from 'react-router'
 import { Separator } from '@/components/ui/separator'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
 import DebugButton from '@/components/app/DebugButton'
@@ -16,7 +16,7 @@ export default function HomeLayout() {
     <div className="flex justify-center space-between p-5">
       <div className="flex-1 invisible"></div>
       <div className="flex-2 text-center font-bold text-2xl">
-        OMEN
+        <Link to="/">OMEN</Link>
       </div>
       <div className="flex flex-1 justify-end">
         {

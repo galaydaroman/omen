@@ -60,7 +60,7 @@ export default function HomePage() {
       <ItemGroup className="flex w-full max-w-md flex-col gap-4 p-2">
         {events.map(event => (
           <Item key={event.id} variant="outline" asChild>
-            <Link to={`/new?name=${event.name}`}>
+            <Link to={`/new?e=${event.id}`}>
               <ItemContent className="text-lg">
                 {event.name}
               </ItemContent>
