@@ -13,19 +13,28 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: [
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'favicon-32x32.png',
+        'favicon-16x16.png',
+        'favicon-16x16.png',
+        'android-chrome-192x192.png',
+        'android-chrome-512x512.png',
+        'site.webmanifest'
+      ],
       manifest: {
-        name: 'Omen - Habit tracker',
+        name: 'Omen - Tracker',
         short_name: 'Omen',
         description: 'Lifetime simple habit tracker',
-        theme_color: '#ffffff',
+        theme_color: '#0b0809',
         display: 'standalone', // Removes Safari UI
         icons: [
-          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' }
+          { src: 'android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }
         ]
       }
-    }),
+    })
   ],
   resolve: {
     alias: {
