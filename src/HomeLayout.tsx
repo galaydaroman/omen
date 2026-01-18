@@ -5,6 +5,8 @@ import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/components/hooks/useIsMobile'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
 import DebugButton from '@/components/app/DebugButton'
+import { isTestCurrentStorageKey } from '@/services/eventsLocalStorage'
+
 import './HomeLayout.css'
 
 export default function HomeLayout() {
@@ -25,7 +27,16 @@ export default function HomeLayout() {
         <div className="flex justify-center space-between p-5">
           <div className="flex-1 invisible"></div>
           <div className="flex-2 text-center font-bold text-2xl">
-            <a href={homePath}>OMEN</a>
+            <a className="relative" href={homePath}>
+              OMEN
+              {
+                isTestCurrentStorageKey() && (
+                  <span className="absolute text-sm top-6 left-0 right-0 text-destructive font-bold">
+                    test
+                  </span>
+                )
+              }
+            </a>
           </div>
           <div className="flex flex-1 justify-end">
             {

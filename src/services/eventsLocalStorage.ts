@@ -1,22 +1,40 @@
 import { nanoid } from 'nanoid'
 import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../types'
 
-export const LOCAL_STORAGE_KEY = 'omen-events'
+const STORAGE_REFERENCE_KEY = 'omen-storage-key'
+const LOCAL_STORAGE_KEY = 'omen-events'
+const TEST_LOCAL_STORAGE_KEY = 'omen-test-events'
 
 interface StorageData {
   events: Events,
   eventLogs: EventLogs
 }
 
+export function readCurrentStorageKey(): string {
+  const storageKey = localStorage.getItem(STORAGE_REFERENCE_KEY)
+  return storageKey || LOCAL_STORAGE_KEY
+}
+
+export function isTestCurrentStorageKey(): boolean {
+  return readCurrentStorageKey() === TEST_LOCAL_STORAGE_KEY
+}
+
+export function resetCurrentStorageKey(test: boolean): void {
+  const storageKey = test ? TEST_LOCAL_STORAGE_KEY : LOCAL_STORAGE_KEY
+  localStorage.setItem(STORAGE_REFERENCE_KEY, storageKey)
+}
+
 export default class EventsLocalStorage implements StorageDataApi {
   private readonly storage: Storage
   private _cache: StorageData | null
   private eventsMapCache: Record<string, Event> | null
+  private storageKey: string
 
   constructor() {
     this.storage = localStorage
     this._cache = null
     this.eventsMapCache = null
+    this.storageKey = readCurrentStorageKey()
   }
 
   initiateData(): StorageData {
@@ -38,7 +56,7 @@ export default class EventsLocalStorage implements StorageDataApi {
   }
 
   getRawData(): string | null {
-    return this.storage.getItem(LOCAL_STORAGE_KEY)
+    return this.storage.getItem(this.storageKey)
   }
 
   getData(): StorageData {
@@ -83,7 +101,7 @@ export default class EventsLocalStorage implements StorageDataApi {
   }
 
   saveData(data: StorageData): void {
-    this.storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data))
+    this.storage.setItem(this.storageKey, JSON.stringify(data))
     this.cache = null
   }
 
