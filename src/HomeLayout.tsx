@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Outlet, useLocation } from 'react-router'
+import { Outlet, useLocation, useHref } from 'react-router'
 import { motion, AnimatePresence } from 'motion/react'
 import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/components/hooks/useIsMobile'
@@ -8,6 +8,7 @@ import DebugButton from '@/components/app/DebugButton'
 import './HomeLayout.css'
 
 export default function HomeLayout() {
+  const homePath = useHref('/')
   const location = useLocation()
   const isMobile = useIsMobile()
 
@@ -24,7 +25,7 @@ export default function HomeLayout() {
         <div className="flex justify-center space-between p-5">
           <div className="flex-1 invisible"></div>
           <div className="flex-2 text-center font-bold text-2xl">
-            <a href="/">OMEN</a>
+            <a href={homePath}>OMEN</a>
           </div>
           <div className="flex flex-1 justify-end">
             {

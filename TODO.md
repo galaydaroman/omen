@@ -8,9 +8,9 @@ TODO
 ## Improvements
 
 1. ~~PWA prompt update and UI~~
+1. Reset storage should have confirm dialog
 1. NewEventLog buttons are too close to each other
 1. NewEventLog create action show show some confirmation notice
-1. Reset storage should have confirm dialog
 1. Test env may be indicated on the logo (or someway else)
 
 ## Features
