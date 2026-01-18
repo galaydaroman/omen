@@ -81,7 +81,7 @@ function MotionWrapper({ children }: React.PropsWithChildren) {
   }, [isHome])
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       <motion.div
         key={location.pathname}
         variants={variants}
