@@ -1,9 +1,7 @@
-export type EventTag = string
-
 export interface Event {
   id: string,
   name: string,
-  tags: EventTag[],
+  tags: string[],
   order?: number
 }
 
@@ -12,7 +10,7 @@ export interface EventLog {
   eventId: string,
   createdAt: string,
   updatedAt: string,
-  tags: EventTag[],
+  tags: string[],
   note?: string
 }
 
