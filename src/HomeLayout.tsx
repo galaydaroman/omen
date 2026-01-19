@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/components/hooks/useIsMobile'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
+import Navigation from '@/components/app/Navigation'
 import DebugButton from '@/components/app/DebugButton'
 import { isTestCurrentStorageKey } from '@/services/eventsLocalStorage'
 
@@ -25,7 +26,9 @@ export default function HomeLayout() {
       <div className="bg-background text-foreground min-h-screen">
         <DebugButton />
         <div className="flex justify-center space-between p-5">
-          <div className="flex-1 invisible"></div>
+          <div className="flex-1">
+            <Navigation />
+          </div>
           <div className="flex-2 text-center font-bold text-2xl">
             <a className="relative" href={homePath}>
               OMEN

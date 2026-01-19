@@ -4,6 +4,7 @@ import HomeLayout from './HomeLayout'
 import HomePage from './HomePage'
 import NewLogPage from './NewLogPage'
 import EditEventPage from './EditEventPage'
+import EventLogsPage from './EventLogsPage'
 import DebugPage from './DebugPage'
 
 const router = createBrowserRouter(
@@ -20,8 +21,12 @@ const router = createBrowserRouter(
           Component: NewLogPage
         },
         {
-          path: 'edit_event',
+          path: 'edit-event',
           Component: EditEventPage
+        },
+        {
+          path: 'history',
+          Component: EventLogsPage
         },
         {
           path: 'debug',
