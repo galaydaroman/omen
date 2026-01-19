@@ -23,9 +23,9 @@ export default function HomeLayout() {
 
   return (
     <Wrapper>
-      <div className="bg-background text-foreground min-h-screen">
+      <div className="bg-background text-foreground h-screen flex flex-col">
         <DebugButton />
-        <div className="flex justify-center space-between p-5">
+        <div className="flex justify-center space-between p-5 flex-shrink-0">
           <div className="flex-1">
             <Navigation />
           </div>
@@ -48,8 +48,10 @@ export default function HomeLayout() {
           </div>
         </div>
         <Separator />
-        <div className="main">
-          <Outlet />
+        <div className="main flex-1 flex flex-col min-h-0">
+          <div className="h-full overflow-y-auto">
+            <Outlet />
+          </div>
         </div>
       </div>
     </Wrapper>

@@ -148,7 +148,12 @@ export default class EventsLocalStorage implements StorageDataApi {
 
   async fetchEventLogs(limit: number = 30): Promise<EventLogs> {
     const data = this.getCachedData()
-    return data.eventLogs.slice(-limit).reverse()
+    const events = this.getEventsMap()
+
+    return data.eventLogs.slice(-limit).reverse().map(eventLog => ({
+      ...eventLog,
+      name: events[eventLog.eventId]?.name
+    }))
   }
 
   validateAndPrepareEventLog(eventLog: Partial<EventLog>): EventLog {

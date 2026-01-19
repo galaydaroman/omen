@@ -69,7 +69,7 @@ export default class EventsStorageAdapter {
     )
   }
 
-  fetchEventLogs(limit: number = 30): ResponseValue<EventLogs> {
+  fetchEventLogs(limit: number = 1000): ResponseValue<EventLogs> {
     return this.formatResponse<EventLogs>(
       'Failed to fetch event logs',
       () => this.storage.fetchEventLogs(limit)

@@ -8,6 +8,7 @@ export interface Event {
 export interface EventLog {
   id: string,
   eventId: string,
+  name?: string,
   createdAt: string,
   updatedAt: string,
   tags: string[],
