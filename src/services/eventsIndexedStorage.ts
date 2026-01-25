@@ -87,8 +87,7 @@ export default class EventsIndexedStorage implements StorageDataApi {
   }
 
   async clearDatabase(): Promise<void> {
-    const db = await this.database()
-    db.close()
+    await this.closeDatabase()
     await deleteDB(currentStorageDatabaseName())
   }
 
