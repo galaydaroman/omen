@@ -1,4 +1,5 @@
 import EventsLocalStorage from './eventsLocalStorage'
+import EventsIndexedStorage from './eventsIndexedStorage'
 import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../types'
 
 type StorageDataConstructor = new () => StorageDataApi
@@ -22,14 +23,15 @@ interface StandardError {
 }
 
 const storageTypes: Record<string, StorageDataConstructor> = {
-  localStorage: EventsLocalStorage
+  localStorage: EventsLocalStorage,
+  indexedStorage: EventsIndexedStorage
 }
 
 export default class EventsStorageAdapter {
   private readonly StorageClass: StorageDataConstructor
   private readonly storage: StorageDataApi
 
-  constructor(storageTypeName: string) {
+  constructor(storageTypeName: string = 'indexedStorage') {
     const FoundClass = storageTypes[storageTypeName]
 
     if (!FoundClass) {
@@ -38,6 +40,10 @@ export default class EventsStorageAdapter {
 
     this.StorageClass = FoundClass
     this.storage = new this.StorageClass()
+  }
+
+  async resetStorage(): Promise<void> {
+    await this.storage.clearDatabase()
   }
 
   async formatResponse<ReturnType>(errorMessage: string, handler: () => Promise<ReturnType>): ResponseValue<ReturnType> {
@@ -57,7 +63,7 @@ export default class EventsStorageAdapter {
 
   fetchEvents(): ResponseValue<Events> {
     return this.formatResponse<Events>(
-      'Faied to fetch events',
+      'Failed to fetch events',
       () => this.storage.fetchEvents()
     )
   }

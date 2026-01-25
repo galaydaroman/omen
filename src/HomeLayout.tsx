@@ -6,7 +6,7 @@ import { useIsMobile } from '@/components/hooks/useIsMobile'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
 import Navigation from '@/components/app/Navigation'
 import DebugButton from '@/components/app/DebugButton'
-import { isTestCurrentStorageKey } from '@/services/eventsLocalStorage'
+import { isTestStorageDatabase } from '@/services/environmentStorageManager'
 
 import './HomeLayout.css'
 
@@ -33,7 +33,7 @@ export default function HomeLayout() {
             <a className="relative" href={homePath}>
               OMEN
               {
-                isTestCurrentStorageKey() && (
+                isTestStorageDatabase() && (
                   <span className="absolute text-sm top-6 left-0 right-0 text-destructive font-bold">
                     test
                   </span>

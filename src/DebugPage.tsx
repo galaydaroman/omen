@@ -17,23 +17,25 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
+import EventsStorageAdapter from '@/services/eventsStorageAdapter'
+
 import {
-  readCurrentStorageKey,
-  isTestCurrentStorageKey,
-  resetCurrentStorageKey
-} from '@/services/eventsLocalStorage'
+  isTestStorageDatabase,
+  resetToStorageDatabase
+} from '@/services/environmentStorageManager'
 
 export default function DebugPage() {
-  const [isTestStorage, setIsTestStorage] = useState<boolean>(isTestCurrentStorageKey())
+  const [isTestStorage, setIsTestStorage] = useState<boolean>(isTestStorageDatabase())
 
   const onTestStorageCheckedChange = useCallback((checked: boolean) => {
-    resetCurrentStorageKey(checked)
+    resetToStorageDatabase(checked)
     setIsTestStorage(checked)
     window.location.reload()
   }, [])
 
-  const resetData = () => {
-    localStorage.setItem(readCurrentStorageKey(), '{}')
+  const resetData = async () => {
+    const storageAdapter = new EventsStorageAdapter()
+    await storageAdapter.resetStorage()
     window.location.reload()
   }
 

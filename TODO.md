@@ -20,6 +20,7 @@ TODO
 1. ~~Test env storage switch~~
 1. ~~Navigation between pages~~
 1. ~~List of event logs page (basic, limited records)~~
+1. ~~Migrate to IndexedDB~~
 1. Light/Dark theme switch
 1. EventLogs page with infinite scroll
 1. EventLogs page with filtering by event(s)

@@ -1,27 +1,11 @@
 import { nanoid } from 'nanoid'
-import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../types'
+import { currentStorageDatabaseName } from '@/services/environmentStorageManager'
 
-const STORAGE_REFERENCE_KEY = 'omen-storage-key'
-const LOCAL_STORAGE_KEY = 'omen-events'
-const TEST_LOCAL_STORAGE_KEY = 'omen-test-events'
+import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../types'
 
 interface StorageData {
   events: Events,
   eventLogs: EventLogs
-}
-
-export function readCurrentStorageKey(): string {
-  const storageKey = localStorage.getItem(STORAGE_REFERENCE_KEY)
-  return storageKey || LOCAL_STORAGE_KEY
-}
-
-export function isTestCurrentStorageKey(): boolean {
-  return readCurrentStorageKey() === TEST_LOCAL_STORAGE_KEY
-}
-
-export function resetCurrentStorageKey(test: boolean): void {
-  const storageKey = test ? TEST_LOCAL_STORAGE_KEY : LOCAL_STORAGE_KEY
-  localStorage.setItem(STORAGE_REFERENCE_KEY, storageKey)
 }
 
 export default class EventsLocalStorage implements StorageDataApi {
@@ -34,7 +18,7 @@ export default class EventsLocalStorage implements StorageDataApi {
     this.storage = localStorage
     this._cache = null
     this.eventsMapCache = null
-    this.storageKey = readCurrentStorageKey()
+    this.storageKey = currentStorageDatabaseName()
   }
 
   initiateData(): StorageData {
@@ -42,6 +26,10 @@ export default class EventsLocalStorage implements StorageDataApi {
       events: [],
       eventLogs: []
     } as StorageData
+  }
+
+  async clearDatabase(): Promise<void> {
+    this.storage.setItem(currentStorageDatabaseName(), '{}')
   }
 
   isStorageDataCorrect(object: unknown): object is StorageData {
