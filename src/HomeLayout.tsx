@@ -3,10 +3,12 @@ import { Outlet, useLocation, useHref } from 'react-router'
 import { motion, AnimatePresence } from 'motion/react'
 import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/components/hooks/useIsMobile'
+import { useOs } from '@/components/hooks/useOs'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
 import Navigation from '@/components/app/Navigation'
 import DebugButton from '@/components/app/DebugButton'
 import { isTestStorageDatabase } from '@/services/environmentStorageManager'
+import { cn } from '@/lib/utils'
 
 import './HomeLayout.css'
 
@@ -14,6 +16,7 @@ export default function HomeLayout() {
   const homePath = useHref('/')
   const location = useLocation()
   const isMobile = useIsMobile()
+  const os = useOs()
 
   const isHome = useMemo(() => {
     return location.pathname === '/'
@@ -23,7 +26,7 @@ export default function HomeLayout() {
 
   return (
     <Wrapper>
-      <div className="bg-background text-foreground h-screen flex flex-col">
+      <div className={cn("bg-background text-foreground flex flex-col h-screen", `os-${os}`)}>
         <DebugButton />
         <div className="flex justify-center space-between p-5 flex-shrink-0">
           <div className="flex-1">
@@ -49,7 +52,7 @@ export default function HomeLayout() {
         </div>
         <Separator />
         <div className="main flex-1 flex flex-col min-h-0">
-          <div className="h-full overflow-y-auto">
+          <div className="h-full overflow-y-auto scroll-container">
             <Outlet />
           </div>
         </div>

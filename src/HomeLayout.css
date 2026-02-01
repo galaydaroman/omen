@@ -1,0 +1,19 @@
+/* Windows specific scrollbar styles */
+.os-windows .scroll-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.os-windows .scroll-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+.os-windows .scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* MacOS/iOS specific scrollbar styles */
+.os-mac .scroll-container,
+.os-ios .scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted-foreground) transparent;
+}
