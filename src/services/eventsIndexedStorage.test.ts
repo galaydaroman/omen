@@ -183,7 +183,7 @@ describe('EventsIndexedStorage', () => {
       const txnMock = { store: storeMock }
       mockDb.transaction.mockReturnValue(txnMock)
 
-      const logs = await service.fetchEventLogs()
+      const logs = await service.fetchEventLogs({ pagination: { limit: 30 } })
 
       expect(logs).toHaveLength(2)
 

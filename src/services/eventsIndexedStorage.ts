@@ -2,7 +2,15 @@ import { nanoid } from 'nanoid'
 import { openDB, deleteDB } from 'idb'
 import { currentStorageDatabaseName } from '@/services/environmentStorageManager'
 import type { DBSchema, IDBPDatabase } from 'idb'
-import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '@/types'
+
+import type {
+  Event,
+  Events,
+  EventLog,
+  EventLogs,
+  StorageDataApi,
+  FetchEventLogsParams
+} from '@/types'
 
 const DB_VERSION = 1;
 
@@ -155,21 +163,52 @@ export default class EventsIndexedStorage implements StorageDataApi {
     this.clearCache()
   }
 
-  async fetchEventLogs(limit: number = 100): Promise<EventLogs> {
+  async fetchEventLogs(params: FetchEventLogsParams): Promise<EventLogs> {
+    const result = []
+    const { filters = {}, pagination } = params
+    const { eventId, dateRange, tags } = filters
+    const limit = pagination?.limit || 20000000
+    const toBeSkipped = Math.max(0, pagination?.offset || 0)
+
     await this.fetchEvents()
     const eventsMap = this.eventsMapCache as Record<string, Event>
 
     const db = await this.database()
     const txn = db.transaction('EventLogs', 'readonly')
-    const index = txn.store.index('by_createdAt')
-    const result = []
+    const index = txn.store.index(eventId ? 'eventId_date' : 'by_createdAt')
 
-    let cursor = await index.openCursor(null, 'prev')
+    let range: IDBKeyRange | null = null
+
+    if (eventId) {
+      range = IDBKeyRange.bound(
+        [eventId, dateRange ? dateRange[0] : ''],
+        [eventId, dateRange ? dateRange[1] : '\uffff']
+      )
+    } else if (!eventId && dateRange) {
+      range = IDBKeyRange.bound(...dateRange)
+    }
+
+    let cursor = await index.openCursor(range, 'prev')
+    let skippedMatchingRecords = 0
+
+    if (!tags?.length && toBeSkipped > 0 && cursor) {
+      skippedMatchingRecords = toBeSkipped
+      cursor = await cursor.advance(skippedMatchingRecords)
+    }
 
     while (cursor && result.length < limit) {
       const eventLog = cursor.value
-      eventLog.name = (eventsMap[eventLog.eventId])?.name
-      result.push(eventLog)
+      const isTagsMatching = !tags?.length || eventLog.tags.some(tag => tags.includes(tag))
+
+      if (isTagsMatching) {
+        if (skippedMatchingRecords < toBeSkipped) {
+          skippedMatchingRecords++;
+        } else {
+          eventLog.name = (eventsMap[eventLog.eventId])?.name
+          result.push(eventLog)
+        }
+      }
+
       cursor = await cursor.continue()
     }
 

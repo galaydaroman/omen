@@ -18,10 +18,26 @@ export interface EventLog {
 export type Events = Event[]
 export type EventLogs = EventLog[]
 
+interface EventLogFilter {
+  eventId?: string,
+  dateRange?: [string, string],
+  tags?: string[]
+}
+
+interface Pagination {
+  offset?: number,
+  limit?: number
+}
+
+export interface FetchEventLogsParams {
+  filters?: EventLogFilter,
+  pagination?: Pagination
+}
+
 export interface StorageDataApi {
   fetchEvents: () => Promise<Events>,
   addEvent: (event: Partial<Event>) => Promise<void>,
-  fetchEventLogs: (limit: number) => Promise<EventLogs>,
+  fetchEventLogs: (params: FetchEventLogsParams) => Promise<EventLogs>,
   addEventLog: (eventLog: Partial<EventLog>) => Promise<void>,
   updateEventLog: (eventLog: EventLog) => Promise<void>,
   clearDatabase: () => Promise<void>

@@ -13,7 +13,7 @@ describe('EventsLocalStorage', () => {
   describe('Initialization', () => {
     it('should return empty data when storage is empty', async () => {
       const events = await service.fetchEvents()
-      const logs = await service.fetchEventLogs()
+      const logs = await service.fetchEventLogs({ pagination: { limit: 30 } })
       expect(events).toEqual([])
       expect(logs).toEqual([])
     })
@@ -62,7 +62,7 @@ describe('EventsLocalStorage', () => {
 
     it('should add an event log and retrieve it', async () => {
       await service.addEventLog({ eventId, note: 'Finished feature' })
-      const logs = await service.fetchEventLogs()
+      const logs = await service.fetchEventLogs({ pagination: { limit: 30 } })
 
       expect(logs).toHaveLength(1)
       expect(logs[0].eventId).toBe(eventId)
@@ -84,7 +84,7 @@ describe('EventsLocalStorage', () => {
       // Small delay to ensure different timestamps if needed, though they are pushed sequentially
       await service.addEventLog({ eventId, note: 'Second' })
 
-      const logs = await service.fetchEventLogs()
+      const logs = await service.fetchEventLogs({ pagination: { limit: 30 } })
       expect(logs[0].note).toBe('Second')
       expect(logs[1].note).toBe('First')
     })
@@ -94,7 +94,7 @@ describe('EventsLocalStorage', () => {
         await service.addEventLog({ eventId, note: `Log ${i}` })
       }
 
-      const logs = await service.fetchEventLogs(2)
+      const logs = await service.fetchEventLogs({ pagination: { limit: 2 } })
       expect(logs).toHaveLength(2)
       expect(logs[0].note).toBe('Log 4')
     })

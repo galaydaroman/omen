@@ -1,7 +1,14 @@
 import { nanoid } from 'nanoid'
 import { currentStorageDatabaseName } from '@/services/environmentStorageManager'
 
-import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../types'
+import type {
+  Event,
+  Events,
+  EventLog,
+  EventLogs,
+  StorageDataApi,
+  FetchEventLogsParams
+} from '../types'
 
 interface StorageData {
   events: Events,
@@ -134,7 +141,8 @@ export default class EventsLocalStorage implements StorageDataApi {
     this.saveData(newData)
   }
 
-  async fetchEventLogs(limit: number = 30): Promise<EventLogs> {
+  async fetchEventLogs(params: FetchEventLogsParams): Promise<EventLogs> {
+    const limit = params.pagination?.limit || 30
     const data = this.getCachedData()
     const events = this.getEventsMap()
 

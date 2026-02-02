@@ -8,8 +8,14 @@ declare global {
   }
 }
 
+interface FetchEventLogsFilter {
+  eventId?: string,
+  tags?: string[],
+  limit: number
+}
+
 const eventsStorage = new EventsStorageAdapter()
-window.eventsStorage = eventsStorage
+// window.eventsStorage = eventsStorage
 
 export const eventApi = createApi({
   reducerPath: 'eventApi',
@@ -24,8 +30,27 @@ export const eventApi = createApi({
       queryFn: (event) => eventsStorage.addEvent(event),
       invalidatesTags: [{ type: 'Event', id: 'LIST' }]
     }),
-    fetchEventLogs: builder.query<EventLogs, void>({
-      queryFn: () => eventsStorage.fetchEventLogs(),
+    fetchEventLogs: builder.infiniteQuery<EventLogs, FetchEventLogsFilter, number>({
+      queryFn: ({ queryArg, pageParam }) => {
+        const offset = queryArg.limit * (pageParam - 1)
+
+        return eventsStorage.fetchEventLogs({
+          filters: {
+            eventId: queryArg.eventId,
+            tags: queryArg.tags,
+          },
+          pagination: {
+            offset,
+            limit: queryArg.limit
+          }
+        })
+      },
+      infiniteQueryOptions: {
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, _allPages, lastPageParam, _allPageParams, queryArg) => {
+          return !queryArg.limit || lastPage.length < queryArg.limit ? undefined : lastPageParam + 1
+        }
+      },
       providesTags: () => [{ type: 'EventLog', id: 'LIST' }]
     }),
     addEventLog: builder.mutation<void, Partial<EventLog>>({
@@ -45,7 +70,7 @@ export const eventApi = createApi({
 export const {
   useFetchEventsQuery,
   useAddEventMutation,
-  useFetchEventLogsQuery,
+  useFetchEventLogsInfiniteQuery,
   useAddEventLogMutation,
   useUpdateEventLogMutation
 } = eventApi

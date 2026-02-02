@@ -1,6 +1,14 @@
 import EventsLocalStorage from './eventsLocalStorage'
 import EventsIndexedStorage from './eventsIndexedStorage'
-import type { Event, Events, EventLog, EventLogs, StorageDataApi } from '../types'
+
+import type {
+  Event,
+  Events,
+  EventLog,
+  EventLogs,
+  StorageDataApi,
+  FetchEventLogsParams
+} from '../types'
 
 type StorageDataConstructor = new () => StorageDataApi
 
@@ -51,6 +59,8 @@ export default class EventsStorageAdapter {
       const result = await handler()
       return { data: result }
     } catch (error) {
+      console.error(error)
+
       return {
         error: {
           status: 'CUSTOM_ERROR',
@@ -75,10 +85,10 @@ export default class EventsStorageAdapter {
     )
   }
 
-  fetchEventLogs(limit: number = 1000): ResponseValue<EventLogs> {
+  fetchEventLogs(params: FetchEventLogsParams): ResponseValue<EventLogs> {
     return this.formatResponse<EventLogs>(
       'Failed to fetch event logs',
-      () => this.storage.fetchEventLogs(limit)
+      () => this.storage.fetchEventLogs(params)
     )
   }
 

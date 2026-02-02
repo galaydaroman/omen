@@ -22,8 +22,8 @@ TODO
 1. ~~List of event logs page (basic, limited records)~~
 1. ~~Migrate to IndexedDB~~
 1. Light/Dark theme switch
-1. EventLogs page with infinite scroll
-1. EventLogs page with filtering by event(s)
+1. ~~EventLogs page with infinite scroll~~
+1. ~~EventLogs page with filtering by event(s) and tags~~
 1. EventLogs page with filtering by date range
 1. Statistics page
 1. Export data to Google Drive (backup)
