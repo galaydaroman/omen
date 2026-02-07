@@ -54,6 +54,10 @@ export default class EventsStorageAdapter {
     await this.storage.clearDatabase()
   }
 
+  exportData(): Promise<ReadableStream<string | Uint8Array>> {
+    return this.storage.exportData()
+  }
+
   async formatResponse<ReturnType>(errorMessage: string, handler: () => Promise<ReturnType>): ResponseValue<ReturnType> {
     try {
       const result = await handler()

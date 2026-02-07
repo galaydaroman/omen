@@ -40,5 +40,6 @@ export interface StorageDataApi {
   fetchEventLogs: (params: FetchEventLogsParams) => Promise<EventLogs>,
   addEventLog: (eventLog: Partial<EventLog>) => Promise<void>,
   updateEventLog: (eventLog: EventLog) => Promise<void>,
-  clearDatabase: () => Promise<void>
+  clearDatabase: () => Promise<void>,
+  exportData: () => Promise<ReadableStream<string | Uint8Array>>
 }

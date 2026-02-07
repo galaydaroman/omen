@@ -214,4 +214,15 @@ export default class EventsLocalStorage implements StorageDataApi {
       eventLogs: updatedLogs
     })
   }
+
+  async exportData(): Promise<ReadableStream<string>> {
+    const data = this.getRawData() || ''
+
+    return new ReadableStream({
+      start(controller) {
+        controller.enqueue(data)
+        controller.close()
+      }
+    })
+  }
 }

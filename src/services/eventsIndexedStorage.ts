@@ -296,4 +296,44 @@ export default class EventsIndexedStorage implements StorageDataApi {
       this.clearCache()
     }
   }
+
+  async exportData(): Promise<ReadableStream<string | Uint8Array>> {
+    const db = await this.database()
+    const encoder = new TextEncoder()
+
+    return new ReadableStream({
+      async start(controller) {
+        try {
+          const txn = db.transaction(['EventLogs', 'Events'], 'readonly')
+          const storeEvents = txn.objectStore('Events')
+
+          for await (const cursor of storeEvents) {
+            const serializedObject = JSON.stringify({
+              ...cursor.value,
+              '__type': 'Event'
+            })
+
+            controller.enqueue(encoder.encode(serializedObject + '\n'))
+          }
+
+          const storeEventLogs = txn.objectStore('EventLogs')
+          const indexByDate = storeEventLogs.index('by_createdAt')
+
+          for await (const cursor of indexByDate.iterate(null, 'prev')) {
+            const serializedObject = JSON.stringify({
+              ...cursor.value,
+              '__type': 'EventLog'
+            })
+
+            controller.enqueue(encoder.encode(serializedObject + '\n'))
+          }
+
+          controller.close()
+        } catch (error) {
+          console.error('Export failed:', error)
+          controller.error(error)
+        }
+      }
+    })
+  }
 }

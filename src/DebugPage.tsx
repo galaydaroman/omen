@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { BrushCleaningIcon, FlaskConicalIcon } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
+import { BrushCleaningIcon, FlaskConicalIcon, DownloadIcon } from 'lucide-react'
 
 import {
   AlertDialog,
@@ -25,15 +26,21 @@ import {
   ItemDescription
 } from '@/components/ui/item'
 
-import EventsStorageAdapter from '@/services/eventsStorageAdapter'
+import { eventsStorage } from '@/services/eventApi'
 
 import {
   isTestStorageDatabase,
   resetToStorageDatabase
 } from '@/services/environmentStorageManager'
 
+const resetData = async () => {
+  await eventsStorage.resetStorage()
+  window.location.reload()
+}
+
 export default function DebugPage() {
   const [isTestStorage, setIsTestStorage] = useState<boolean>(isTestStorageDatabase())
+  const [downloadWait, setDownloadWait] = useState<boolean>(false)
 
   const onTestStorageCheckedChange = useCallback((checked: boolean) => {
     resetToStorageDatabase(checked)
@@ -41,10 +48,19 @@ export default function DebugPage() {
     window.location.reload()
   }, [])
 
-  const resetData = async () => {
-    const storageAdapter = new EventsStorageAdapter()
-    await storageAdapter.resetStorage()
-    window.location.reload()
+  const exportData = async () => {
+    setDownloadWait(true)
+    const stream = await eventsStorage.exportData()
+    const response = new Response(stream)
+    const blob = await response.blob()
+    setDownloadWait(false)
+
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `backup_events_${new Date().toISOString()}.ndjson`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   return <div className="flex justify-center">
@@ -63,6 +79,23 @@ export default function DebugPage() {
               checked={isTestStorage}
               onCheckedChange={onTestStorageCheckedChange}
             />
+          </ItemActions>
+        </Item>
+
+        <Item variant="outline">
+          <ItemMedia variant="icon">
+            <DownloadIcon />
+          </ItemMedia>
+          <ItemContent>
+            <ItemTitle>Export data</ItemTitle>
+            <ItemDescription>Download your data in NDJson format</ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            {
+              downloadWait
+                ? <Spinner />
+                : <Button onClick={exportData}>Download</Button>
+            }
           </ItemActions>
         </Item>
 

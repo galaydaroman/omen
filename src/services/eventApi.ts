@@ -14,7 +14,7 @@ interface FetchEventLogsFilter {
   limit: number
 }
 
-const eventsStorage = new EventsStorageAdapter()
+export const eventsStorage = new EventsStorageAdapter()
 // window.eventsStorage = eventsStorage
 
 export const eventApi = createApi({
