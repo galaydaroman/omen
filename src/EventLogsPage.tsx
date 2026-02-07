@@ -84,7 +84,7 @@ function EventLogList({ eventLogs, isFetching }: { eventLogs: EventLogs, isFetch
                   {parseAndFormatDate(eventLog.createdAt)}
                 </div>
               </ItemTitle>
-              <ItemDescription>
+              <ItemDescription className="min-h-[22px]">
                 {
                   eventLog.tags.map(tag => (
                     <Badge key={tag} className="mr-1" variant="secondary">
