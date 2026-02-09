@@ -6,6 +6,7 @@ import NewLogPage from './NewLogPage'
 import EditEventPage from './EditEventPage'
 import EventLogsPage from './EventLogsPage'
 import DebugPage from './DebugPage'
+import StatisticsPage from './StatisticsPage'
 
 const router = createBrowserRouter(
   [
@@ -27,6 +28,10 @@ const router = createBrowserRouter(
         {
           path: 'history',
           Component: EventLogsPage
+        },
+        {
+          path: 'statistics',
+          Component: StatisticsPage
         },
         {
           path: 'debug',

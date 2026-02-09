@@ -58,6 +58,10 @@ export default defineConfig({
               return 'motion-vendor';
             }
 
+            if (id.includes('node_modules/recharts')) {
+              return 'recharts-vendor';
+            }
+
             return 'vendor';
           }
         }

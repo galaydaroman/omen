@@ -29,6 +29,9 @@ export default function Navigation() {
               <NavigationMenuLink asChild>
                 <Link to="/history">History</Link>
               </NavigationMenuLink>
+              <NavigationMenuLink asChild>
+                <Link to="/statistics">Statistics</Link>
+              </NavigationMenuLink>
             </li>
           </ul>
         </NavigationMenuContent>

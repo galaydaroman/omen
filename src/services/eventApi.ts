@@ -14,6 +14,12 @@ interface FetchEventLogsFilter {
   limit: number
 }
 
+interface FetchEventLogsByDateFilter {
+  eventId: string,
+  tags?: string[],
+  dateRange: [string, string]
+}
+
 export const eventsStorage = new EventsStorageAdapter()
 // window.eventsStorage = eventsStorage
 
@@ -47,9 +53,21 @@ export const eventApi = createApi({
       },
       infiniteQueryOptions: {
         initialPageParam: 1,
-        getNextPageParam: (lastPage, _allPages, lastPageParam, _allPageParams, queryArg) => {
-          return !queryArg.limit || lastPage.length < queryArg.limit ? undefined : lastPageParam + 1
+        getNextPageParam: (currentPage, _allPages, currentPageParam, _allPageParams, queryArg) => {
+          return !queryArg.limit || currentPage.length < queryArg.limit ? undefined : currentPageParam + 1
         }
+      },
+      providesTags: () => [{ type: 'EventLog', id: 'LIST' }]
+    }),
+    fetchEventLogsByDate: builder.query<EventLogs, FetchEventLogsByDateFilter>({
+      queryFn: ({ eventId, tags, dateRange }) => {
+        return eventsStorage.fetchEventLogs({
+          filters: {
+            eventId,
+            tags,
+            dateRange
+          }
+        })
       },
       providesTags: () => [{ type: 'EventLog', id: 'LIST' }]
     }),
@@ -70,6 +88,7 @@ export const eventApi = createApi({
 export const {
   useFetchEventsQuery,
   useAddEventMutation,
+  useFetchEventLogsByDateQuery,
   useFetchEventLogsInfiniteQuery,
   useAddEventLogMutation,
   useUpdateEventLogMutation
