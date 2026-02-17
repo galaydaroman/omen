@@ -1,8 +1,17 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
+
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Spinner } from '@/components/ui/spinner'
-import { BrushCleaningIcon, FlaskConicalIcon, DownloadIcon } from 'lucide-react'
+import { Progress } from '@/components/ui/progress'
+import { FieldError } from '@/components/ui/field'
+
+import {
+  BrushCleaningIcon,
+  FlaskConicalIcon,
+  DownloadIcon,
+  UploadIcon
+} from 'lucide-react'
 
 import {
   AlertDialog,
@@ -27,20 +36,22 @@ import {
 } from '@/components/ui/item'
 
 import { eventsStorage } from '@/services/eventApi'
+import importEvents from '@/services/importEvents'
 
 import {
   isTestStorageDatabase,
   resetToStorageDatabase
 } from '@/services/environmentStorageManager'
 
-const resetData = async () => {
-  await eventsStorage.resetStorage()
-  window.location.reload()
-}
-
 export default function DebugPage() {
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isTestStorage, setIsTestStorage] = useState<boolean>(isTestStorageDatabase())
   const [downloadWait, setDownloadWait] = useState<boolean>(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [uploadInProgress, setUploadInProgress] = useState<boolean>(false)
+  const [uploadProgress, setUploadProgress] = useState<number>(0)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [resetDataError, setResetDataError] = useState<string | null>(null)
 
   const onTestStorageCheckedChange = useCallback((checked: boolean) => {
     resetToStorageDatabase(checked)
@@ -48,20 +59,59 @@ export default function DebugPage() {
     window.location.reload()
   }, [])
 
-  const exportData = async () => {
-    setDownloadWait(true)
-    const stream = await eventsStorage.exportData()
-    const response = new Response(stream)
-    const blob = await response.blob()
-    setDownloadWait(false)
+  const resetData = useCallback(async () => {
+    setResetDataError(null)
 
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `backup_events_${new Date().toISOString()}.ndjson`
-    a.click()
-    URL.revokeObjectURL(url)
+    await eventsStorage.resetStorage().catch(error => {
+      setResetDataError(error?.message)
+    })
+
+    window.location.reload()
+  }, [])
+
+  const exportData = async () => {
+    setDownloadError(null)
+    setDownloadWait(true)
+
+    const stream = await eventsStorage.exportData().catch(error => {
+      setDownloadError(error?.message)
+    })
+
+    if (stream) {
+      const response = new Response(stream)
+      const blob = await response.blob()
+      setDownloadWait(false)
+
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `backup_events_${new Date().toISOString()}.ndjson`
+      a.click()
+      URL.revokeObjectURL(url)
+    }
   }
+
+  const openFileDialog = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const uploadFile = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0]
+
+    if (!file) return;
+
+    setUploadError(null)
+    setUploadInProgress(true)
+
+    await importEvents(file, setUploadProgress).catch(error => {
+      setUploadError(error?.message)
+    })
+
+    setUploadInProgress(false)
+    setUploadProgress(0)
+
+    event.target.value = ''
+  }, [])
 
   return <div className="flex justify-center">
     <div className="flex flex-col gap-4 w-md max-w-md">
@@ -88,7 +138,8 @@ export default function DebugPage() {
           </ItemMedia>
           <ItemContent>
             <ItemTitle>Export data</ItemTitle>
-            <ItemDescription>Download your data in NDJson format</ItemDescription>
+            <ItemDescription>Download your data in NDJSON format</ItemDescription>
+            {downloadError && <FieldError>{downloadError}</FieldError>}
           </ItemContent>
           <ItemActions>
             {
@@ -101,11 +152,28 @@ export default function DebugPage() {
 
         <Item variant="outline">
           <ItemMedia variant="icon">
+            <UploadIcon />
+          </ItemMedia>
+          <ItemContent>
+            <ItemTitle>Import data</ItemTitle>
+            <ItemDescription>Import your data from NDJSON file</ItemDescription>
+            {uploadInProgress && <Progress value={uploadProgress} />}
+            {uploadError && <FieldError>{uploadError}</FieldError>}
+          </ItemContent>
+          <ItemActions>
+            <input type="file" className="hidden" ref={fileInputRef} onChange={uploadFile} />
+            <Button onClick={openFileDialog} disabled={uploadInProgress}>Upload</Button>
+          </ItemActions>
+        </Item>
+
+        <Item variant="outline">
+          <ItemMedia variant="icon">
             <BrushCleaningIcon />
           </ItemMedia>
           <ItemContent>
             <ItemTitle>Reset storage</ItemTitle>
             <ItemDescription>⚠️ Remove all data from current storage. Destructive action.</ItemDescription>
+            {resetDataError && <FieldError>{resetDataError}</FieldError>}
           </ItemContent>
           <ItemActions>
             <AlertDialog>

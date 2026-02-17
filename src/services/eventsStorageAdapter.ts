@@ -6,6 +6,7 @@ import type {
   Events,
   EventLog,
   EventLogs,
+  StorageRecord,
   StorageDataApi,
   FetchEventLogsParams
 } from '../types'
@@ -56,6 +57,10 @@ export default class EventsStorageAdapter {
 
   exportData(): Promise<ReadableStream<string | Uint8Array>> {
     return this.storage.exportData()
+  }
+
+  importData(items: StorageRecord[]): Promise<void> {
+    return this.storage.importData(items)
   }
 
   async formatResponse<ReturnType>(errorMessage: string, handler: () => Promise<ReturnType>): ResponseValue<ReturnType> {

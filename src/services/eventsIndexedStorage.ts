@@ -8,6 +8,7 @@ import type {
   Events,
   EventLog,
   EventLogs,
+  StorageRecord,
   StorageDataApi,
   FetchEventLogsParams
 } from '@/types'
@@ -163,6 +164,12 @@ export default class EventsIndexedStorage implements StorageDataApi {
     this.clearCache()
   }
 
+  // Implementations
+  // 1. By all events with tags
+  // 1. By one event with tags
+  // 1. By one event with tags and by date range
+  // 1. By multiple events with tags
+  // 1. By multiple events with tags and by date range
   async fetchEventLogs(params: FetchEventLogsParams): Promise<EventLogs> {
     const result = []
     const { filters = {}, pagination } = params
@@ -335,5 +342,39 @@ export default class EventsIndexedStorage implements StorageDataApi {
         }
       }
     })
+  }
+
+  async importData(items: StorageRecord[]): Promise<void> {
+    const db = await this.database()
+
+    const events: Event[] = []
+    const eventLogs: EventLog[] = []
+
+    items.forEach(item => {
+      const { __type, ...object } = item
+
+      if (__type === 'Event') {
+        events.push(object as Event)
+      } else if (__type === 'EventLog') {
+        eventLogs.push(object as EventLog)
+      } else {
+        throw new Error('Import data process cannot recognize record type.')
+      }
+    })
+
+    const txn = db.transaction(['EventLogs', 'Events'], 'readwrite')
+    const storeEvents = txn.objectStore('Events')
+    const storeEventLogs = txn.objectStore('EventLogs')
+
+    const eventsPromises = events.map(event => storeEvents.add(event))
+    const eventLogsPromises = eventLogs.map(eventLog => storeEventLogs.add(eventLog))
+
+    await Promise.all([
+      ...eventsPromises,
+      ...eventLogsPromises,
+      txn.done
+    ])
+
+    this.clearCache()
   }
 }

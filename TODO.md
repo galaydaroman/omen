@@ -29,4 +29,5 @@ TODO
 1. Statistics page with calendar
 1. ~~Export data to downloadable file~~
 1. Export data to Google Drive (backup)
+1. ~~Import data from file~~
 1. Import data from Google Drive

@@ -6,6 +6,7 @@ import type {
   Events,
   EventLog,
   EventLogs,
+  StorageRecord,
   StorageDataApi,
   FetchEventLogsParams
 } from '../types'
@@ -223,6 +224,27 @@ export default class EventsLocalStorage implements StorageDataApi {
         controller.enqueue(data)
         controller.close()
       }
+    })
+  }
+
+  async importData(items: StorageRecord[]): Promise<void> {
+    const data = this.getCachedData()
+    const events = [...data.events]
+    const eventLogs = [...data.eventLogs]
+
+    items.forEach(item => {
+      if (item.__type === 'Event') {
+        events.push(item)
+      } else if (item.__type === 'EventLog') {
+        eventLogs.push(item)
+      } else {
+        throw new Error('Import data cannot recognize record object type')
+      }
+    })
+
+    this.saveData({
+      events,
+      eventLogs
     })
   }
 }

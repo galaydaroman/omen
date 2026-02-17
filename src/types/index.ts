@@ -1,4 +1,5 @@
 export interface Event {
+  __type?: 'Event',
   id: string,
   name: string,
   tags: string[],
@@ -6,6 +7,7 @@ export interface Event {
 }
 
 export interface EventLog {
+  __type?: 'EventLog',
   id: string,
   eventId: string,
   name?: string,
@@ -17,6 +19,7 @@ export interface EventLog {
 
 export type Events = Event[]
 export type EventLogs = EventLog[]
+export type StorageRecord = Event | EventLog
 
 interface EventLogFilter {
   eventId?: string,
@@ -41,5 +44,6 @@ export interface StorageDataApi {
   addEventLog: (eventLog: Partial<EventLog>) => Promise<void>,
   updateEventLog: (eventLog: EventLog) => Promise<void>,
   clearDatabase: () => Promise<void>,
-  exportData: () => Promise<ReadableStream<string | Uint8Array>>
+  exportData: () => Promise<ReadableStream<string | Uint8Array>>,
+  importData: (items: StorageRecord[]) => Promise<void>
 }
