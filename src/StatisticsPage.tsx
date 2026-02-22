@@ -135,10 +135,10 @@ export default function StatisticsPage() {
   }, [eventLogs, filter, dateRange, isEventLogsLoading])
 
   const chartConfig = useMemo(() => {
-    return filter.reduce<ChartConfig>((result, value) => {
+    return filter.reduce<ChartConfig>((result, value, index) => {
       result[value.eventId] = {
-        label: value.event.name
-        // color: '#2563eb',
+        label: value.event.name,
+        color: `var(--chart-${(index % 5) + 1})`
         // theme: 'dark'
       }
 
@@ -186,8 +186,8 @@ export default function StatisticsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-              <BarChart data={chartData}>
+            <ChartContainer config={chartConfig} className="h-[300px] min-h-[300px] w-full">
+              <BarChart data={chartData} className="h-[300px] min-h-[300px] w-full">
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -219,7 +219,7 @@ export default function StatisticsPage() {
                       key={item.eventId}
                       stackId={"a"}
                       dataKey={item.eventId}
-                      fill={`var(--color-chart-${(index % 5) + 1})`}
+                      fill={`var(--chart-${(index % 5) + 1})`}
                     />
                   ))
                 }
