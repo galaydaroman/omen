@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
-import { useFetchEventLogsByDateQuery, useFetchEventsQuery } from '@/services/eventApi'
-import type { Event } from '@/types'
-import { ChevronsUpDownIcon } from 'lucide-react'
+import { useFetchEventLogsByDateQuery } from '@/services/eventApi'
+import EventsFilter, { type EventsFilterItem } from '@/components/app/EventsFilter'
 
 import {
   format,
@@ -16,23 +15,22 @@ import {
 } from 'date-fns'
 
 import { Spinner } from '@/components/ui/spinner'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
-import { type ChartConfig } from '@/components/ui/chart'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from '@/components/ui/collapsible'
+  type ChartConfig,
+  ChartLegend,
+  ChartLegendContent,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent
+} from '@/components/ui/chart'
 
 import {
   Card,
   CardTitle,
-  CardAction,
   CardHeader,
   CardContent,
   CardDescription
@@ -43,11 +41,6 @@ import {
   NativeSelectOption
 } from '@/components/ui/native-select'
 
-import {
-  Field,
-  FieldGroup
-} from '@/components/ui/field'
-
 type Period = 'week' | 'month'
 
 function formatDateKey(date: Date) {
@@ -56,11 +49,9 @@ function formatDateKey(date: Date) {
 
 export default function StatisticsPage() {
   const [today] = useState<Date>(startOfDay(new Date()))
-  const [event, setEvent] = useState<Event | null>()
-  const [tags, setTags] = useState<string[]>([])
+  const [filter, setFilter] = useState<EventsFilterItem[]>([])
   const [period, setPeriod] = useState<Period>('week')
   const [currentPage, setCurrentPage] = useState<number>(1)
-  const { data: events, isLoading: isEventsLoading } = useFetchEventsQuery()
 
   const dateRange = useMemo(() => {
     const initialPeriodStartDate = period === 'week'
@@ -87,13 +78,12 @@ export default function StatisticsPage() {
     isError: isEventLogsError,
     error
   } = useFetchEventLogsByDateQuery({
-    eventId: event?.id ?? '',
-    tags,
+    events: filter,
     dateRange: [
       dateRange[0].toISOString(),
       dateRange[1].toISOString()
     ]
-  }, { skip: !event })
+  }, { skip: !filter.length })
 
   const nextPage = useCallback(() => {
     setCurrentPage(currentPage => currentPage + 1)
@@ -108,29 +98,19 @@ export default function StatisticsPage() {
     setCurrentPage(1)
   }, [])
 
-  const changeSelectedEvent = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const eventId = e.target.value
-    const selectedEvent = events?.find(event => event.id === eventId)
-    setEvent(selectedEvent)
-    setTags([])
-  }, [events])
-
-  const toggleTag = useCallback((tag: string) => () => {
-    if (tags.includes(tag)) {
-      setTags(tags.filter(t => t !== tag))
-    } else {
-      setTags([...tags, tag])
-    }
-  }, [tags])
-
   const chartData = useMemo(() => {
     const [startDate, endDate] = dateRange
-    const dataHash: Record<string, number> = {}
+    const dataHash: Record<string, Record<string, number>> = {}
+
+    const zeroDataItem = filter.reduce((result, item) => {
+      result[item.eventId] = 0
+      return result
+    }, {} as Record<string, number>)
 
     let currentDate = startDate
     while (currentDate < endDate) {
       const key = formatDateKey(currentDate)
-      dataHash[key] = 0
+      dataHash[key] = { ...zeroDataItem }
       currentDate = addDays(currentDate, 1)
     }
 
@@ -140,26 +120,31 @@ export default function StatisticsPage() {
         const key = formatDateKey(createdAt)
 
         if (dataHash[key] !== undefined) {
-          dataHash[key] += 1
+          if (dataHash[key][eventLog.eventId] !== undefined) {
+            dataHash[key][eventLog.eventId] += 1
+          } else {
+            console.log('[StatisticsPage] event log is out of event list')
+          }
         } else {
           console.log('[StatisticsPage] event log is out of range')
         }
       })
     }
 
-    return Object.entries(dataHash).map(([key, value]) => ({
-      date: key,
-      count: value
-    }))
-  }, [eventLogs, dateRange, isEventLogsLoading])
+    return Object.entries(dataHash).map(([date, data]) => ({ date, ...data }))
+  }, [eventLogs, filter, dateRange, isEventLogsLoading])
 
-  const chartConfig = useMemo(() => ({
-    count: {
-      label: event?.name,
-      // color: '#2563eb',
-      // theme: 'dark'
-    }
-  } satisfies ChartConfig), [event])
+  const chartConfig = useMemo(() => {
+    return filter.reduce<ChartConfig>((result, value) => {
+      result[value.eventId] = {
+        label: value.event.name
+        // color: '#2563eb',
+        // theme: 'dark'
+      }
+
+      return result
+    }, {})
+  }, [filter])
 
   if (isEventLogsError) {
     console.log(error)
@@ -168,66 +153,7 @@ export default function StatisticsPage() {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col w-full max-w-md">
-        <Collapsible>
-          <Card className="my-4 py-2">
-            <CardHeader>
-                <CollapsibleTrigger asChild>
-                  <CardDescription className="pt-2">
-                    Filter history
-                  </CardDescription>
-                </CollapsibleTrigger>
-              <CardAction>
-                <CollapsibleTrigger asChild>
-                  <Button variant="secondary" size="icon-sm">
-                    <ChevronsUpDownIcon />
-                  </Button>
-                </CollapsibleTrigger>
-              </CardAction>
-            </CardHeader>
-            <CollapsibleContent asChild>
-              <CardContent className="pb-2">
-                <FieldGroup>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field>
-                      <div className="flex items-center w-full relative">
-                        <NativeSelect id="selected-event" className="w-full" onChange={changeSelectedEvent} value={event?.id ?? ''}>
-                          <NativeSelectOption value="">All events</NativeSelectOption>
-                          {
-                            events?.map(event => (
-                              <NativeSelectOption key={event.id} value={event.id}>
-                                {event.name}
-                              </NativeSelectOption>
-                            ))
-                          }
-                        </NativeSelect>
-                        {
-                          isEventsLoading && <Spinner className="ml-2" />
-                        }
-                      </div>
-                    </Field>
-                    <Field>
-                      <div className="flex flex-wrap gap-2">
-                        {
-                          event?.tags.map(tag => (
-                            <Badge
-                              key={tag}
-                              className="dark:text-foreground cursor-pointer"
-                              size="lg"
-                              variant={tags.includes(tag) ? "default" : "secondary"}
-                              onClick={toggleTag(tag)}
-                            >
-                              {tag}
-                            </Badge>
-                          ))
-                        }
-                      </div>
-                    </Field>
-                  </div>
-                </FieldGroup>
-              </CardContent>
-            </CollapsibleContent>
-          </Card>
-        </Collapsible>
+        <EventsFilter onFilterChange={setFilter} />
 
         <Card className="pt-0">
           <CardHeader className="flex flex-col items-stretch border-b !p-0 sm:flex-row">
@@ -241,7 +167,7 @@ export default function StatisticsPage() {
               </CardTitle>
               <CardDescription>
                 {
-                  !event ? "Select event" : `Showing data for "${event.name}" event`
+                  "Select event"
                 }
               </CardDescription>
             </div>
@@ -260,7 +186,7 @@ export default function StatisticsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+            <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
               <BarChart data={chartData}>
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <CartesianGrid vertical={false} />
@@ -280,14 +206,23 @@ export default function StatisticsPage() {
                   }}
                 />
                 <YAxis
-                  dataKey="count"
                   tickLine={false}
                   tickMargin={0}
                   axisLine={false}
                   allowDecimals={false}
                   width={20}
                 />
-                <Bar dataKey="count" fill="var(--color-chart-1)" />
+                <ChartLegend content={<ChartLegendContent />} />
+                {
+                  filter.map((item, index) => (
+                    <Bar
+                      key={item.eventId}
+                      stackId={"a"}
+                      dataKey={item.eventId}
+                      fill={`var(--color-chart-${(index % 5) + 1})`}
+                    />
+                  ))
+                }
               </BarChart>
             </ChartContainer>
           </CardContent>

@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { Event, Events, EventLog, EventLogs } from '../types'
+import type { Event, Events, EventLog, EventLogs, EventFilter } from '../types'
 import EventsStorageAdapter from './eventsStorageAdapter'
 
 declare global {
@@ -9,14 +9,12 @@ declare global {
 }
 
 interface FetchEventLogsFilter {
-  eventId?: string,
-  tags?: string[],
+  events: EventFilter[],
   limit: number
 }
 
 interface FetchEventLogsByDateFilter {
-  eventId: string,
-  tags?: string[],
+  events: EventFilter[],
   dateRange: [string, string]
 }
 
@@ -42,8 +40,7 @@ export const eventApi = createApi({
 
         return eventsStorage.fetchEventLogs({
           filters: {
-            eventId: queryArg.eventId,
-            tags: queryArg.tags,
+            events: queryArg.events
           },
           pagination: {
             offset,
@@ -60,11 +57,10 @@ export const eventApi = createApi({
       providesTags: () => [{ type: 'EventLog', id: 'LIST' }]
     }),
     fetchEventLogsByDate: builder.query<EventLogs, FetchEventLogsByDateFilter>({
-      queryFn: ({ eventId, tags, dateRange }) => {
+      queryFn: ({ events, dateRange }) => {
         return eventsStorage.fetchEventLogs({
           filters: {
-            eventId,
-            tags,
+            events,
             dateRange
           }
         })

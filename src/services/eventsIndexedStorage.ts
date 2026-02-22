@@ -165,58 +165,105 @@ export default class EventsIndexedStorage implements StorageDataApi {
   }
 
   // Implementations
-  // 1. By all events with tags
+  // 1. No events filter / All events
+  // 1. No events filter but date range / All events
   // 1. By one event with tags
   // 1. By one event with tags and by date range
-  // 1. By multiple events with tags
-  // 1. By multiple events with tags and by date range
+  // 1. By multiple events with corresponding tags
+  // 1. By multiple events with corresponding tags and by date range
+  // 1. [paginated] No events filter / All events
+  // 1. [paginated] No events filter but date range / All events
+  // 1. [paginated] By one event with tags
+  // 1. [paginated] By one event with tags and by date range
+  // 1. [paginated] By multiple events with corresponding tags
+  // 1. [paginated] By multiple events with corresponding tags and by date range
   async fetchEventLogs(params: FetchEventLogsParams): Promise<EventLogs> {
     const result = []
-    const { filters = {}, pagination } = params
-    const { eventId, dateRange, tags } = filters
+
+    const { filters = { events: [] }, pagination } = params
     const limit = pagination?.limit || 20000000
-    const toBeSkipped = Math.max(0, pagination?.offset || 0)
+    const recordsToBeSkipped = Math.max(0, pagination?.offset || 0)
+    const { events: eventsFilter = [], dateRange } = filters
 
     await this.fetchEvents()
     const eventsMap = this.eventsMapCache as Record<string, Event>
 
     const db = await this.database()
     const txn = db.transaction('EventLogs', 'readonly')
-    const index = txn.store.index(eventId ? 'eventId_date' : 'by_createdAt')
 
-    let range: IDBKeyRange | null = null
+    if (eventsFilter.length === 0) {
+      const index = txn.store.index('by_createdAt')
+      const range: IDBKeyRange | null = dateRange ? IDBKeyRange.bound(...dateRange) : null
 
-    if (eventId) {
-      range = IDBKeyRange.bound(
-        [eventId, dateRange ? dateRange[0] : ''],
-        [eventId, dateRange ? dateRange[1] : '\uffff']
-      )
-    } else if (!eventId && dateRange) {
-      range = IDBKeyRange.bound(...dateRange)
-    }
+      let cursor = await index.openCursor(range, 'prev')
 
-    let cursor = await index.openCursor(range, 'prev')
-    let skippedMatchingRecords = 0
+      if (cursor) {
+        if (recordsToBeSkipped > 0) {
+          cursor = await cursor.advance(recordsToBeSkipped)
+        }
 
-    if (!tags?.length && toBeSkipped > 0 && cursor) {
-      skippedMatchingRecords = toBeSkipped
-      cursor = await cursor.advance(skippedMatchingRecords)
-    }
-
-    while (cursor && result.length < limit) {
-      const eventLog = cursor.value
-      const isTagsMatching = !tags?.length || eventLog.tags.some(tag => tags.includes(tag))
-
-      if (isTagsMatching) {
-        if (skippedMatchingRecords < toBeSkipped) {
-          skippedMatchingRecords++;
-        } else {
-          eventLog.name = (eventsMap[eventLog.eventId])?.name
+        while (cursor && result.length < limit) {
+          const eventLog = cursor.value
+          const event = eventsMap[eventLog.eventId]
+          eventLog.name = event?.name
           result.push(eventLog)
+
+          cursor = await cursor.continue()
         }
       }
+    } else {
+      const index = txn.store.index('eventId_date')
 
-      cursor = await cursor.continue()
+      const cursorWrapperPromises = eventsFilter.map(async ({ eventId, tags }) => {
+        const range = IDBKeyRange.bound(
+          [eventId, dateRange ? dateRange[0] : ''],
+          [eventId, dateRange ? dateRange[1] : '\uffff']
+        )
+
+        return {
+          eventId,
+          tags: tags || [],
+          cursor: await index.openCursor(range, 'prev')
+        }
+      })
+
+      let cursorWrappers = await Promise.all(cursorWrapperPromises)
+      cursorWrappers = cursorWrappers.filter(cursorWrapper => cursorWrapper.cursor)
+
+      let recordsSkipped = 0;
+
+      while (cursorWrappers.length && result.length < limit) {
+        let selectedCursorIndex = 0;
+
+        for (let i = 1; i < cursorWrappers.length; i++) {
+          const selectedCursor = cursorWrappers[selectedCursorIndex].cursor!
+          const currentCursor = cursorWrappers[i].cursor!
+
+          if (currentCursor.value.createdAt > selectedCursor.value.createdAt) {
+            selectedCursorIndex = i
+          }
+        }
+
+        const cursorWrapper = cursorWrappers[selectedCursorIndex]
+        const eventLog = cursorWrapper.cursor!.value
+        const isTagsMatching = !cursorWrapper.tags.length || eventLog.tags.some(tag => cursorWrapper.tags.includes(tag))
+
+        if (isTagsMatching) {
+          if (recordsSkipped < recordsToBeSkipped) {
+            recordsSkipped++;
+          } else {
+            const event = eventsMap[eventLog.eventId]
+            eventLog.name = event?.name
+            result.push(eventLog)
+          }
+        }
+
+        cursorWrapper.cursor = await cursorWrapper.cursor!.continue()
+
+        if (!cursorWrapper.cursor) {
+          cursorWrappers.splice(selectedCursorIndex, 1)
+        }
+      }
     }
 
     return result

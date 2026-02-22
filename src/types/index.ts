@@ -21,19 +21,23 @@ export type Events = Event[]
 export type EventLogs = EventLog[]
 export type StorageRecord = Event | EventLog
 
-interface EventLogFilter {
-  eventId?: string,
-  dateRange?: [string, string],
-  tags?: string[]
-}
-
 interface Pagination {
   offset?: number,
   limit?: number
 }
 
+export interface EventFilter {
+  eventId: string,
+  tags?: string[]
+}
+
+interface EventLogFilters {
+  events: EventFilter[],
+  dateRange?: [string, string]
+}
+
 export interface FetchEventLogsParams {
-  filters?: EventLogFilter,
+  filters?: EventLogFilters,
   pagination?: Pagination
 }
 
