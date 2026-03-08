@@ -63,7 +63,8 @@ export default function CreateEventDrawer() {
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button onClick={openDrawer}>
-          <CirclePlusIcon /> New Event
+          <CirclePlusIcon />
+          <span className="hidden sm:block">New Event</span>
         </Button>
       </DrawerTrigger>
       <DrawerContent>

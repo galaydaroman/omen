@@ -96,9 +96,9 @@ function NewLogForm({ event }: { event: Event }) {
     <div className="flex justify-center p-4">
       <div className="flex w-full max-w-md flex-col gap-4 p-2">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center">
-          Log <span className="text-primary">"{event.name}"</span>
+          <span className="text-primary">{event.name}</span>
         </h3>
-        <p className="text-muted text-center">
+        <p className="text-muted-foreground text-center">
           Pick descriptive tags below or add more:
         </p>
         <div className="flex w-full flex-wrap gap-2">

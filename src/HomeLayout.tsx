@@ -7,6 +7,7 @@ import { useOs } from '@/components/hooks/useOs'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
 import Navigation from '@/components/app/Navigation'
 import DebugButton from '@/components/app/DebugButton'
+import ThemeToggle from '@/components/app/ThemeToggle'
 import { isTestStorageDatabase } from '@/services/environmentStorageManager'
 import { cn } from '@/lib/utils'
 
@@ -44,7 +45,8 @@ export default function HomeLayout() {
               }
             </a>
           </div>
-          <div className="flex flex-1 justify-end">
+          <div className="flex flex-1 justify-end gap-2">
+            <ThemeToggle />
             {
               isHome && <CreateEventDrawer />
             }
