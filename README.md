@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# Omen
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Omen is a modern, privacy-first event tracking and logging application. Built as a Progressive Web App (PWA), it is designed for **habit tracking** and **medical/health monitoring**, but flexible enough for any general-purpose event logging. All data is stored locally in your browser using IndexedDB, ensuring your privacy remains a priority.
 
-Currently, two official plugins are available:
+🌐 **Live Demo:** [https://galaydaroman.github.io/omen-page/](https://galaydaroman.github.io/omen-page/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+- **Health & Habit Tracking:** Log symptoms, medication, daily habits, or any recurring events with custom tags.
+- **Privacy Centric:** No cloud syncing by default; your data stays on your device (Offline-first).
+- **Rich Visualization:** Analyze patterns with interactive charts and statistics powered by Recharts.
+- **Advanced Filtering:** Browse your history with infinite scroll and multi-criteria filters (events, tags, dates).
+- **Data Portability:** Full control over your data with JSON-based Import/Export functionality.
+- **PWA Ready:** Install it on your mobile device or desktop for an app-like experience.
+- **Theming:** Native support for Light and Dark modes.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework:** [React 19](https://react.dev/)
+- **Build Tool:** [Vite](https://vitejs.dev/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS 4](https://tailwindcss.com/) & [Radix UI](https://www.radix-ui.com/)
+- **State Management:** [Redux Toolkit](https://redux-toolkit.js.org/)
+- **Storage:** [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) (via `idb`)
+- **Charts:** [Recharts](https://recharts.org/)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Node.js:** ~24.12.0
+- **npm** (or your preferred package manager)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Installation
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/galaydaroman/omen-page.git
+   cd omen
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+### Available Scripts
+
+- `npm run dev`: Starts the Vite development server.
+- `npm run build`: Compiles the application for production.
+- `npm run test`: Runs the test suite using Vitest.
+- `npm run lint`: Performs linting checks with ESLint.
+- `npm run preview`: Previews the production build locally.
+- `npm run deploy`: Deploys the application to GitHub Pages.
+
+## 📝 Roadmap
+
+Check the [TODO.md](./TODO.md) file for planned features, including:
+- [ ] Calendar view for the Statistics page.
+- [ ] Frequent event prioritization for faster logging.
+- [ ] UI refinements for the New Event Log action.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
