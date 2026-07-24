@@ -1,5 +1,5 @@
 import { useFetchEventsQuery } from './services/eventApi'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import {
