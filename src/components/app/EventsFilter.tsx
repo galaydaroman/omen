@@ -91,7 +91,7 @@ export default function EventsFilter({ initialFilter = [], onFilterChange }: Eve
   }, [data, events, onFilterChange])
 
   return (
-    <Collapsible>
+    <Collapsible defaultOpen>
       <Card className="my-4 py-2">
         <CardHeader>
             <CollapsibleTrigger asChild>

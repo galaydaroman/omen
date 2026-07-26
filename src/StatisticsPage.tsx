@@ -131,8 +131,21 @@ export default function StatisticsPage() {
       })
     }
 
-    return Object.entries(dataHash).map(([date, data]) => ({ date, ...data }))
+    return Object.entries(dataHash).map(([date, data]) => ({ date, ...data })) as Record<string, string | number>[]
   }, [eventLogs, filter, dateRange, isEventLogsLoading])
+
+  const statsData = useMemo(() => {
+    const totalPerDate = chartData.map(data => {
+      return Object.values(data)
+        .filter((value): value is number => Number.isFinite(value))
+        .reduce<number>((result: number, count: number) => result + count, 0)
+    })
+
+    const total = totalPerDate.reduce<number>((result, count) => result + count, 0)
+    const avarage = Math.round(100 * total / totalPerDate.length) / 100
+
+    return { total, avarage }
+  }, [chartData])
 
   const chartConfig = useMemo(() => {
     return filter.reduce<ChartConfig>((result, value, index) => {
@@ -156,31 +169,48 @@ export default function StatisticsPage() {
         <EventsFilter onFilterChange={setFilter} />
 
         <Card className="pt-0">
-          <CardHeader className="flex flex-col items-stretch border-b !p-0 sm:flex-row">
-            <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
-
-              <CardTitle>
-                <div className="flex flex-row">
-                  <span>Statistics chart</span>
-                  {isEventLogsLoading && <Spinner className="ml-2" />}
+          <CardHeader className="flex flex-col items-stretch !p-0 gap-0">
+            <div className="flex flex-col items-stretch justify-center border-b !p-0 sm:flex-row">
+              <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
+                <CardTitle>
+                  <div className="flex flex-row">
+                    <span>Statistics chart</span>
+                    {isEventLogsLoading && <Spinner className="ml-2" />}
+                  </div>
+                </CardTitle>
+                <CardDescription>
+                  {
+                    "Select event"
+                  }
+                </CardDescription>
+              </div>
+                <div className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l">
+                  <span className="text-muted-foreground text-xs">
+                    Period
+                  </span>
+                  <div className="text-lg leading-none font-bold sm:text-3xl">
+                    <NativeSelect id="selected-period" onChange={changePeriod} value={period}>
+                      <NativeSelectOption value="week">By week</NativeSelectOption>
+                      <NativeSelectOption value="month">By month</NativeSelectOption>
+                    </NativeSelect>
+                  </div>
                 </div>
-              </CardTitle>
-              <CardDescription>
-                {
-                  "Select event"
-                }
-              </CardDescription>
             </div>
-            <div className="flex">
-              <div className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6">
+            <div className="flex flex-col justify-center border-b !p-0 flex-row">
+              <div className="flex flex-1 flex-col justify-center gap-1 border-t-0 px-6 py-4 text-left even:border-l sm:px-8 sm:py-6">
                 <span className="text-muted-foreground text-xs">
-                  Period
+                  Avarage
                 </span>
                 <div className="text-lg leading-none font-bold sm:text-3xl">
-                  <NativeSelect id="selected-period" onChange={changePeriod} value={period}>
-                    <NativeSelectOption value="week">By week</NativeSelectOption>
-                    <NativeSelectOption value="month">By month</NativeSelectOption>
-                  </NativeSelect>
+                  {statsData.avarage}
+                </div>
+              </div>
+              <div className="flex flex-1 flex-col justify-center gap-1 border-t-0 px-6 py-4 text-left even:border-l sm:px-8 sm:py-6">
+                <span className="text-muted-foreground text-xs">
+                  Total
+                </span>
+                <div className="text-lg leading-none font-bold sm:text-3xl">
+                  {statsData.total}
                 </div>
               </div>
             </div>
