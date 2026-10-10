@@ -145,7 +145,10 @@ function EventLogList({ eventLogs, isFetching }: { eventLogs: EventLogs, isFetch
                   }
                 </ItemDescription>
                 {
-                  eventLog.note && <ItemDescription>{eventLog.note}</ItemDescription>
+                  eventLog.note &&
+                    <ItemDescription className="whitespace-pre-wrap line-clamp-none">
+                      {eventLog.note}
+                    </ItemDescription>
                 }
               </ItemContent>
             </Item>
