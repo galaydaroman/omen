@@ -11,7 +11,8 @@ import {
   startOfDay,
   startOfWeek,
   startOfMonth,
-  subMilliseconds
+  subMilliseconds,
+  differenceInHours
 } from 'date-fns'
 
 import { Spinner } from '@/components/ui/spinner'
@@ -141,11 +142,18 @@ export default function StatisticsPage() {
         .reduce<number>((result: number, count: number) => result + count, 0)
     })
 
+    const [startDate, endDate] = dateRange
+    let totalDays = totalPerDate.length
+
+    if (today <= endDate) {
+      totalDays = differenceInHours(new Date(), startDate) / 24
+    }
+
     const total = totalPerDate.reduce<number>((result, count) => result + count, 0)
-    const avarage = Math.round(100 * total / totalPerDate.length) / 100
+    const avarage = Math.round(100 * total / totalDays) / 100
 
     return { total, avarage }
-  }, [chartData])
+  }, [chartData, dateRange, today])
 
   const chartConfig = useMemo(() => {
     return filter.reduce<ChartConfig>((result, value, index) => {
