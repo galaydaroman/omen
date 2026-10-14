@@ -102,12 +102,12 @@ function NewLogForm({ event }: { event: Event }) {
           Pick descriptive tags below or add more:
         </p>
         <div className="flex w-full flex-wrap gap-2">
-          <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerTrigger asChild>
+          <Drawer showSwipeHandle swipeDirection="down" open={open} onOpenChange={setOpen}>
+            <DrawerTrigger render={
               <Button variant="outline" size="icon" className="rounded-full">
                 <PlusIcon />
               </Button>
-            </DrawerTrigger>
+            } />
             <DrawerContent>
               <div className="mx-auto w-full max-w-sm p-10 pt-0">
                 <DrawerHeader>

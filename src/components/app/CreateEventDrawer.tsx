@@ -60,13 +60,13 @@ export default function CreateEventDrawer() {
   }, [setOpen])
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
+    <Drawer showSwipeHandle swipeDirection="down" open={open} onOpenChange={setOpen}>
+      <DrawerTrigger render={
         <Button onClick={openDrawer}>
           <CirclePlusIcon />
           <span className="hidden sm:block">New Event</span>
         </Button>
-      </DrawerTrigger>
+      } />
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm p-10 pt-0">
           <DrawerHeader>

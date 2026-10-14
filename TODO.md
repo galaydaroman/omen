@@ -15,6 +15,7 @@ TODO
 1. ~~Statistic page with total and avarage~~
 1. ~~Statistics average numbers should ignore future time (if shown current week/month view)~~
 1. ~~History page doesn't respect multiline descriptions~~
+1. ~~Update Drawer with the new version~~
 1. NewEventLog buttons are too close to each other
 1. NewEventLog create action show some confirmation notice
 1. Show frequent events on top of the list
