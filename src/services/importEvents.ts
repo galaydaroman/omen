@@ -36,7 +36,7 @@ export default async function importEvents(file: File, callback?: CallbackFuncti
           item = JSON.parse(line)
         } catch (err) {
           console.error(err)
-          throw new Error('Parsing file error')
+          throw new Error('Parsing file error', { cause: err })
         }
 
         if (item?.__type && !['Event', 'EventLog'].includes(item.__type)) {

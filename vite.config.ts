@@ -43,7 +43,10 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
-    globals: true
+    globals: true,
+    execArgv: [
+      '--no-webstorage'
+    ]
   },
   build: {
     rollupOptions: {
