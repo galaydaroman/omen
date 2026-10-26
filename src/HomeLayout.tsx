@@ -6,7 +6,7 @@ import { useIsMobile } from '@/components/hooks/useIsMobile'
 import { useOs } from '@/components/hooks/useOs'
 import CreateEventDrawer from '@/components/app/CreateEventDrawer'
 import Navigation from '@/components/app/Navigation'
-import DebugButton from '@/components/app/DebugButton'
+import BottomNavigation from '@/components/app/BottomNavigation'
 import ThemeToggle from '@/components/app/ThemeToggle'
 import { isTestStorageDatabase } from '@/services/environmentStorageManager'
 import { cn } from '@/lib/utils'
@@ -28,7 +28,6 @@ export default function HomeLayout() {
   return (
     <Wrapper>
       <div className={cn("bg-background text-foreground flex flex-col h-screen", `os-${os}`)}>
-        <DebugButton />
         <div className="flex justify-center space-between p-5 flex-shrink-0">
           <div className="flex-1">
             <Navigation />
@@ -56,8 +55,10 @@ export default function HomeLayout() {
         <div className="main flex-1 flex flex-col min-h-0">
           <div className="h-full overflow-y-auto scroll-container">
             <Outlet />
+            <div className="min-h-24"></div>
           </div>
         </div>
+        <BottomNavigation />
       </div>
     </Wrapper>
   )

@@ -162,8 +162,8 @@ function NewLogForm({ event }: { event: Event }) {
         <div className="flex flex-col w-full text-center">
           <FieldError className="w-full">{errorMessage}</FieldError>
           <div className="flex flex-col gap-2 items-center">
-            <Button variant="default" className="w-48" onClick={handleCreate} disabled={isLoading}>Create</Button>
-            <Button variant="outline" className="w-48" onClick={handleCancel}>Cancel</Button>
+            <Button variant="default" className="w-48 mt-4" onClick={handleCreate} disabled={isLoading}>Create</Button>
+            <Button variant="outline" className="w-48 mt-4" onClick={handleCancel}>Cancel</Button>
           </div>
         </div>
       </div>
