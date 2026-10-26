@@ -20,6 +20,7 @@ TODO
 1. NewEventLog create action show some confirmation notice
 1. Show frequent events on top of the list
 1. Statistics page with single event filter shows graph split by tags (colored)
+1. Navigation: bottom panel
 
 ## Features
 
