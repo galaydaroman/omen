@@ -1,4 +1,3 @@
-import EventsLocalStorage from './eventsLocalStorage'
 import EventsIndexedStorage from './eventsIndexedStorage'
 
 import type {
@@ -32,7 +31,6 @@ interface StandardError {
 }
 
 const storageTypes: Record<string, StorageDataConstructor> = {
-  localStorage: EventsLocalStorage,
   indexedStorage: EventsIndexedStorage
 }
 

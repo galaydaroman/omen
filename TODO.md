@@ -17,11 +17,11 @@ TODO
 1. ~~History page doesn't respect multiline descriptions~~
 1. ~~Update Drawer with the new version~~
 1. ~~Navigation: bottom panel~~
+1. ~~Cleanup unused components~~
 1. NewEventLog buttons are too close to each other
 1. NewEventLog create action show some confirmation notice
 1. Show frequent events on top of the list
 1. Statistics page with single event filter shows graph split by tags (colored)
-1. Cleanup unused components
 
 ## Features
 
