@@ -25,7 +25,7 @@ export default function HomeLayout() {
 
   const Wrapper = isMobile ? MotionWrapper : EmptyWrapper
 
-  return (
+  return <>
     <Wrapper>
       <div className={cn("bg-background text-foreground flex flex-col h-screen", `os-${os}`)}>
         <div className="flex justify-center space-between p-5 flex-shrink-0">
@@ -58,10 +58,10 @@ export default function HomeLayout() {
             <div className="min-h-24"></div>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     </Wrapper>
-  )
+    <BottomNavigation />
+  </>
 }
 
 function MotionWrapper({ children }: React.PropsWithChildren) {

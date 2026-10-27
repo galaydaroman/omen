@@ -1,5 +1,5 @@
 .bottom-nav-panel {
-  background-color: --alpha(var(--card) / 60%);
+  background-color: --alpha(var(--card) / 85%);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }

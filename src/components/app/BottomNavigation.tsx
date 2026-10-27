@@ -37,7 +37,7 @@ export default function BottomNavigation() {
   }, [])
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+    <div className="fixed bottom-0 left-0 right-0 flex justify-center">
       <Card className="bottom-nav-panel flex flex-row justify-center gap-3 min-w-72 mb-4 rounded-full py-2">
         <Button variant={selectedButton(isHomePage)} className="rounded-full size-12" asChild>
           <Link to="/">
